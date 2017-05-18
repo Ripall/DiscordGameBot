@@ -53,7 +53,7 @@ async def start(url):
                 elif data["op"] == 0:  # Dispatch
                     last_sequence = data['s']
                     if data['t'] == "MESSAGE_CREATE" :
-                            await send_message(data['d']['author']['id'],data['d']['content'])
+                            asyncio.ensure_future(send_message(data['d']['author']['id'],data['d']['content']))
                     print(data)
                 elif data["op"] == 11:  # Heartbeat ACK
                     pass
