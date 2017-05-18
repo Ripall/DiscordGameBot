@@ -52,9 +52,17 @@ async def start(url):
                     })
                 elif data["op"] == 0:  # Dispatch
                     last_sequence = data['s']
-                    if data['t'] == "MESSAGE_CREATE" :
-                            asyncio.ensure_future(send_message(data['d']['author']['id'],data['d']['content']))
-                    print(data)
+                    if data['t'] == "MESSAGE_CREATE":
+                        if 'bot' not in data['d']['author']: 
+                            task = asyncio.ensure_future(send_message(data['d']['author']['id'],data['d']['content']))
+                        else:
+                            print(data)
+                            
+                        if data['d']['content'] == 'quit':
+                            print('Bye bye!')
+                            # On l'attend l'envoi du message ci-dessus.
+                            await asyncio.wait([task])
+                            break
                 elif data["op"] == 11:  # Heartbeat ACK
                     pass
                 else:
