@@ -6,6 +6,7 @@
 import asyncio
 import json
 import aiohttp
+import string
 
 URL = "https://discordapp.com/api"
 last_sequence = None
@@ -54,7 +55,8 @@ async def start(url):
                     last_sequence = data['s']
                     if data['t'] == "MESSAGE_CREATE":
                         if 'bot' not in data['d']['author']: 
-                            task = asyncio.ensure_future(send_message(data['d']['author']['id'],data['d']['content']))
+                            str = board()
+                            task = asyncio.ensure_future(send_message(data['d']['author']['id'],str))
                         else:
                             print(data)
                             
@@ -86,6 +88,14 @@ async def send_message(recipient_id, content):
                           "POST",
                           json={"content": content})
     
+    
+def board():
+    str ="__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:9]) + "|\n"
+    for num in range(1,10,1):
+        str += f"{num}" + "".join("| " for i in range(0,9)) + "|\n"
+    str += "```__"
+    return str
+            
 async def main():
     """Main program."""
     response = await api_call("/gateway")
