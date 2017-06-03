@@ -28,9 +28,8 @@ def start(data):
         return [games['player1']['id'],"Game started!",games['player2']['id'],"It's time to d-d-d-d-duel!"]
          
 
-#def board(data):
-#   my_board(data)
-#   adversary_board(data)
+def board(data):
+    return [data['d']['author']['id'],my_board(data)[1] + " " + adversary_board(data)[1]]
 
 def my_board(data):
     if is_game_started:
@@ -45,7 +44,7 @@ def my_board(data):
         board += "```__"
         return [data['d']['author']['id'],board]
     else:
-        return [data['d']['author']['id'],"Please start the game sale penguin"]
+        return [data['d']['author']['id'],"Please start the game"]
 
 def fire(data):
     if are_boats_placed:
@@ -153,6 +152,6 @@ def adversary_board(data):
         board += "```__"
         return [data['d']['author']['id'],board]
     else:
-        return [data['d']['author']['id'],"Please start the game sale penguin"]
+        return [data['d']['author']['id'],"Please start the game"]
 
     

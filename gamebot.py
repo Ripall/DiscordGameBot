@@ -43,6 +43,7 @@ async def api_call(path, method="GET", **kwargs):
  
 async def start(url):
     global last_sequence
+    task = 0
     with aiohttp.ClientSession() as session:
         async with session.ws_connect(
                 f"{url}?v=6&encoding=json") as ws:
