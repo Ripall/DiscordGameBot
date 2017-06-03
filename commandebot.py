@@ -28,14 +28,18 @@ def start(data):
         return [games['player1']['id'],"Game started!",games['player2']['id'],"It's time to d-d-d-d-duel!"]
          
 
-def board(data):
+#def board(data):
+#   my_board(data)
+#   adversary_board(data)
+
+def my_board(data):
     if is_game_started:
         player = get_player(data)
         
         if player  == "try again":
             return [data['d']['author']['id'],"Mais t'es qui?"]
         
-        board ="__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:row]) + "|\n"
+        board ="votre board\n__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:row]) + "|\n"
         for num in range(0,row,1):
             board += str(num+1) + "".join("|"+games[player]["board"][num*row+i] for i in range(0,row)) + "|\n"
         board += "```__"
@@ -60,7 +64,7 @@ def fire(data):
             else:
                 games[player]['board'][case_impact] = 'O'
             games["turn"] = games[player]['id']
-            return board(data)
+            return adversary_board(data)
         else:
             return [data['d']['author']['id'],"It's not your turn.",get_other_player(data),"Your friend is waiting for you."]
     else:
@@ -111,12 +115,12 @@ def put(data):
             if games['player1']["nb_boat"]==5 and games['player2']["nb_boat"]==5:
                 are_boats_placed = True
                 return [games['player1'][id],"Your turn to fire",games['player2'],"Wait for the other player to fire."]
-            return board(data)
-        
+            return my_board(data)        
         else:
             return [data['d']['author']['id'],"The way is obstructed."]
     else:
         return [data['d']['author']['id'],"Please start the game..."]
+
 
 def get_player(data):
     if games['player1']['id'] == data['d']['author']['id']:
@@ -135,5 +139,20 @@ def get_other_player(data):
     else:
         return 'try again'
             
+
+def adversary_board(data):
+    if is_game_started:
+        player = get_other_player(data)
+        
+        if player  == "try again":
+            return [data['d']['author']['id'],"Mais t'es qui?"]
+        
+        board ="board de l'adversaire\n__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:row]) + "|\n"
+        for num in range(0,row,1):
+            board += str(num+1) + "".join("|"+games[player]["board"][num*row+i] if not games[player]["board"][num*row+i] == 'B' else '| ' for i in range(0,row)) + "|\n"
+        board += "```__"
+        return [data['d']['author']['id'],board]
+    else:
+        return [data['d']['author']['id'],"Please start the game sale penguin"]
 
     

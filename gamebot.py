@@ -2,7 +2,6 @@
 """
 @author: Dylan Santos de Pinho, Cédric Pahud
 """
-
 import asyncio
 import json
 import aiohttp
