@@ -7,7 +7,7 @@ import string
 
 row = 9
 board_player = [" "]*row**2
-numbers_of_boats = 3
+numbers_of_boats = 1
 player = {"id":0,"board":board_player,"nb_boat":0}
 # game = {"player1":player.copy,"player2":player.copy}
 games = {"player1":player.copy(),"player2":player.copy(), "turn":0}
@@ -76,14 +76,14 @@ def fire(data):
             case_impact = (ord(case_coord[1])-49)*9+ord(case_coord[0])-65
             if games[player]['board'][case_impact] == 'B':
                 games[player]['board'][case_impact] = 'X'
-                games[player]['board']["nb_boat"] -= 1
-                if games[player]['board']["nb_boat"] == 0 :
+                games[player]["nb_boat"] -= 1
+                if games[player]["nb_boat"] == 0 :
                     is_game_started = False
                     return [data['d']['author']['id'],"You won the game",games[get_other_player(data)]['id'],"Your lost the game."]
             else:
                 games[player]['board'][case_impact] = 'O'
             games["turn"] = games[player]['id']
-            return [data['d']['author']['id'],adversary_board(data)[1],games[get_other_player(data)]['id'],"Your turn now."]
+            return [data['d']['author']['id'],adversary_board(data)[1],games[get_other_player(data)]['id'],adversary_board_with_boat(data)[1]+"\nYour turn now."]
         else:
             return [data['d']['author']['id'],"It's not your turn.",get_other_player(data),"Your friend is waiting for you."]
     else:
@@ -99,7 +99,7 @@ def put(data):
         if player  == "try again":
             return [data['d']['author']['id'],"Mais t'es qui?"]
         
-        if games[player]['nb_boat'] == numbers_of_boats:
+        if games[player]['nb_boat'] == numbers_of_boats*taille:
             return [data['d']['author']['id'],"All your boats are placed"]
         
         game_temp = games[player]['board'].copy()
@@ -132,8 +132,8 @@ def put(data):
         
         if not collision:
             games[player]['board'] = game_temp.copy()  
-            games[player]["nb_boat"] +=1 
-            if games['player1']["nb_boat"]==numbers_of_boats and games['player2']["nb_boat"]==numbers_of_boats:
+            games[player]["nb_boat"] +=taille 
+            if games['player1']["nb_boat"]==numbers_of_boats*taille and games['player2']["nb_boat"]==numbers_of_boats*taille:
                 are_boats_placed = True
                 return [games['player1']['id'],"Your turn to fire",games['player2']['id'],"Wait for the other player to fire."]
             return my_board(data)        
@@ -168,7 +168,7 @@ def adversary_board_with_boat(data):
         if player  == "try again":
             return [data['d']['author']['id'],"Mais t'es qui?"]
         
-        board ="board de l'adversaire\n__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:row]) + "|\n"
+        board ="votre board\n__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:row]) + "|\n"
         for num in range(0,row,1):
             board += str(num+1) + "".join("|"+games[player]["board"][num*row+i] for i in range(0,row)) + "|\n"
         board += "```__"
