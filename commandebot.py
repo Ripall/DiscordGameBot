@@ -1,0 +1,140 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun  1 08:53:24 2017
+
+@author: dylan.santosde <- Et que lui :D
+"""
+import shlex
+import string
+
+row = 9
+board_player = [" "]*row**2
+player = {"id":0,"board":board_player,"nb_boat":0}
+# game = {"player1":player.copy,"player2":player.copy}
+games = {"player1":player.copy(),"player2":player.copy(), "turn":0}
+
+is_game_started = False
+are_boats_placed = False
+
+def help(data):
+    return [data['d']['author']['id'],"Who needs help? I dont care"]
+    
+def start(data):
+    global is_game_started
+    print(data)
+    if not is_game_started:
+        games['player1']['id'] = data['d']['author']['id']            
+        games['player2']['id'] = data['d']['mentions'][0]['id']  
+        games["turn"] = games['player1']['id']
+        is_game_started = True
+        return [games['player1']['id'],"Partie lancée!",games['player2']['id'],"Tu as été défié et tu ne peux qu'accepter"]
+         
+
+def board(data):
+    if is_game_started:
+        player = get_player(data)
+        
+        if player  == "try again":
+            return [data['d']['author']['id'],"Mais t'es qui?"]
+        
+        board ="__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:row]) + "|\n"
+        for num in range(0,row,1):
+            board += str(num+1) + "".join("|"+games[player]["board"][num*row+i] for i in range(0,row)) + "|\n"
+        board += "```__"
+        return [data['d']['author']['id'],board]
+    else:
+        return [data['d']['author']['id'],"Please start the game sale penguin"]
+
+def fire(data):
+    if are_boats_placed:
+        if games["turn"] == data['d']['author']['id']:
+            
+            player = get_other_player(data)
+            
+            if player  == "try again":
+                return [data['d']['author']['id'],"Mais t'es qui?"]
+                 
+            str = data['d']['content']
+            case_coord = shlex.split(str, posix=False)[1].upper()
+            case_impact = (ord(case_coord[1])-49)*9+ord(case_coord[0])-65
+            if games[player]['board'][case_impact] == 'B':
+                games[player]['board'][case_impact] = 'X'
+            else:
+                games[player]['board'][case_impact] = 'O'
+            games["turn"] = games[player]['id']
+            return board(data)
+        else:
+            return [data['d']['author']['id'],"It's not your turn man"]
+    else:
+        return [data['d']['author']['id'],"Please start the game sale penguin"]
+        
+def put(data):
+    global games
+    global are_boats_placed
+    if is_game_started:
+        taille = 3
+        player = get_player(data)
+        
+        if player  == "try again":
+            return [data['d']['author']['id'],"Mais t'es qui?"]
+        
+        if games[player]['nb_boat'] == 5:
+            return [data['d']['author']['id'],"T'as placé tous tes boats"]
+        
+        game_temp = games[player]['board'].copy()
+        
+        collision = False
+        str = data['d']['content']
+        case_coord = shlex.split(str, posix=False)[1].upper()
+        position =  shlex.split(str, posix=False)[2].upper()
+        case_posage = (ord(case_coord[1])-49)*9+ord(case_coord[0])-65
+        temp = 0;
+        for i in range(0,taille):
+            if case_posage < row**2:
+                if temp > case_posage%row:
+                    collision = True                    
+                temp = case_posage%row
+                if game_temp[case_posage] == ' ':
+                    game_temp[case_posage] = 'B'
+                else:
+                    collision = True
+                
+                if position=="H" :
+                   case_posage += 1
+                else :
+                    case_posage += row 
+                    
+            else:
+                collision = True
+        
+        if not collision:
+            games[player]['board'] = game_temp.copy()  
+            games[player]["nb_boat"] +=1 
+            if games['player1']["nb_boat"]==5 and games['player2']["nb_boat"]==5:
+                are_boats_placed = True
+            return board(data)
+        
+        else:
+            return [data['d']['author']['id'],"Yo le mongole fais un effort"]
+    else:
+        return [data['d']['author']['id'],"Please start the game sale penguin"]
+
+def get_player(data):
+    if games['player1']['id'] == data['d']['author']['id']:
+        return 'player1'
+    elif games['player2']['id'] == data['d']['author']['id']:
+        return 'player2'
+    else:
+        return 'try again'
+            
+
+def get_other_player(data):
+    if games['player1']['id'] == data['d']['author']['id']:
+        return 'player2'
+    elif games['player2']['id'] == data['d']['author']['id']:
+        return 'player1'
+    else:
+        return 'try again'
+            
+
+    

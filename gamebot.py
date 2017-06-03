@@ -6,11 +6,23 @@
 import asyncio
 import json
 import aiohttp
-import string
+
+import shlex
+
+import commandebot
 
 URL = "https://discordapp.com/api"
-last_sequence = None
+last_sequence = None    
 
+# Spyder hack pour recréer une boucle.
+# Pas nécessaire hors de Spyder
+loop = asyncio.get_event_loop()
+if loop.is_closed():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+# fin du hack
+
+TOKEN = "MzE0NjU4ODkzNzkzOTg0NTEy.C_7Ylg.AaOPDGgpNitFQwTdQDmyNX8selo"
 async def api_call(path, method="GET", **kwargs):
     """Return the JSON body of a call to Discord REST API."""
     defaults = {
@@ -55,12 +67,16 @@ async def start(url):
                     last_sequence = data['s']
                     if data['t'] == "MESSAGE_CREATE":
                         if 'bot' not in data['d']['author']: 
-                            str = board()
-                            task = asyncio.ensure_future(send_message(data['d']['author']['id'],str))
+                            str = data['d']['content']
+                            f = shlex.split(str, posix=False)[0]
+                            if f[0]=='!' and hasattr(commandebot,f[1::]) :
+                               task = asyncio.ensure_future(send_message(getattr(commandebot,f[1::])(data)))
+                            else:
+                               print(data)
                         else:
-                            print(data)
+                             print(data)
                             
-                        if data['d']['content'] == 'quit':
+                        if data['d']['content'] == '!quit':
                             print('Bye bye!')
                             # On l'attend l'envoi du message ci-dessus.
                             await asyncio.wait([task])
@@ -80,21 +96,21 @@ async def heartbeat(ws, interval):
         })
     
 
-async def send_message(recipient_id, content):
+async def send_message(data):
     """Send a message with content to the recipient_id."""
-    channel = await api_call("/users/@me/channels", "POST",
-                             json={"recipient_id": recipient_id})
-    return await api_call(f"/channels/{channel['id']}/messages",
+    channel_player1 = await api_call("/users/@me/channels", "POST",
+                             json={"recipient_id": data[0]})
+    await api_call(f"/channels/{channel_player1['id']}/messages",
                           "POST",
-                          json={"content": content})
+                          json={"content": data[1]})
     
     
-def board():
-    str ="__``` |" +  "|".join(letter for letter in string.ascii_uppercase[0:9]) + "|\n"
-    for num in range(1,10,1):
-        str += f"{num}" + "".join("| " for i in range(0,9)) + "|\n"
-    str += "```__"
-    return str
+    channel_player2 = await api_call("/users/@me/channels", "POST",
+                             json={"recipient_id": data[2]})
+    return await api_call(f"/channels/{channel_player2['id']}/messages",
+                          "POST",
+                          json={"content": data[3]})
+    
             
 async def main():
     """Main program."""
