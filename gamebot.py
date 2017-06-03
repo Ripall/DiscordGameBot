@@ -22,7 +22,6 @@ if loop.is_closed():
     asyncio.set_event_loop(loop)
 # fin du hack
 
-TOKEN = "MzE0NjU4ODkzNzkzOTg0NTEy.C_7Ylg.AaOPDGgpNitFQwTdQDmyNX8selo"
 async def api_call(path, method="GET", **kwargs):
     """Return the JSON body of a call to Discord REST API."""
     defaults = {
