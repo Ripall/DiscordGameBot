@@ -25,7 +25,7 @@ def start(data):
         games['player2']['id'] = data['d']['mentions'][0]['id']  
         games["turn"] = games['player1']['id']
         is_game_started = True
-        return [games['player1']['id'],"Partie lancée!",games['player2']['id'],"Tu as été défié et tu ne peux qu'accepter"]
+        return [games['player1']['id'],"Game started!",games['player2']['id'],"It's time to d-d-d-d-duel!"]
          
 
 def board(data):
@@ -62,9 +62,9 @@ def fire(data):
             games["turn"] = games[player]['id']
             return board(data)
         else:
-            return [data['d']['author']['id'],"It's not your turn man"]
+            return [data['d']['author']['id'],"It's not your turn.",get_other_player(data),"Your friend is waiting for you."]
     else:
-        return [data['d']['author']['id'],"Please start the game sale penguin"]
+        return [data['d']['author']['id'],"Please start the game and/or place your boats to fire"]
         
 def put(data):
     global games
@@ -77,7 +77,7 @@ def put(data):
             return [data['d']['author']['id'],"Mais t'es qui?"]
         
         if games[player]['nb_boat'] == 5:
-            return [data['d']['author']['id'],"T'as placé tous tes boats"]
+            return [data['d']['author']['id'],"All your boats are placed"]
         
         game_temp = games[player]['board'].copy()
         
@@ -110,10 +110,11 @@ def put(data):
             games[player]["nb_boat"] +=1 
             if games['player1']["nb_boat"]==5 and games['player2']["nb_boat"]==5:
                 are_boats_placed = True
+                return [games['player1'][id],"Your turn to fire",games['player2'],"Wait for the other player to fire."]
             return board(data)
         
         else:
-            return [data['d']['author']['id'],"The way is obstructed"]
+            return [data['d']['author']['id'],"The way is obstructed."]
     else:
         return [data['d']['author']['id'],"Please start the game..."]
 
