@@ -2,7 +2,8 @@
 """
 Created on Thu Jun  1 08:53:24 2017
 
-@author: dylan.santosde <- Et que lui :D
+
+@author: Dylan Santos de Pinho, Cédric Pahud
 """
 import shlex
 import string
@@ -29,6 +30,7 @@ def start(data):
         is_game_started = True
         return [games['player1']['id'],"Partie lancée!",games['player2']['id'],"Tu as été défié et tu ne peux qu'accepter"]
          
+
 #def board(data):
 #   my_board(data)
 #   adversary_board(data)
@@ -115,12 +117,14 @@ def put(data):
             games[player]["nb_boat"] +=1 
             if games['player1']["nb_boat"]==5 and games['player2']["nb_boat"]==5:
                 are_boats_placed = True
+
             return my_board(data)
         
         else:
-            return [data['d']['author']['id'],"Yo le mongole fais un effort"]
+            return [data['d']['author']['id'],"The way is obstructed"]
     else:
-        return [data['d']['author']['id'],"Please start the game sale penguin"]
+        return [data['d']['author']['id'],"Please start the game..."]
+
 
 def get_player(data):
     if games['player1']['id'] == data['d']['author']['id']:
@@ -139,6 +143,7 @@ def get_other_player(data):
     else:
         return 'try again'
             
+
 def adversary_board(data):
     if is_game_started:
         player = get_other_player(data)
@@ -153,4 +158,5 @@ def adversary_board(data):
         return [data['d']['author']['id'],board]
     else:
         return [data['d']['author']['id'],"Please start the game sale penguin"]
+
     
