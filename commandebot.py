@@ -16,7 +16,13 @@ is_game_started = False
 are_boats_placed = False
 
 def help(data):
-    return [data['d']['author']['id'],"Who needs help? I dont care"]
+    str_help = "```!help : to get all the commands\n"
+    str_help += "!start @player : to start a game with a player\n"
+    str_help += "!board @player : to get the boards, B = boats, O = miss, X = boat hitted\n"
+    str_help += "!put position alignment : to put a boat in position(A1, A2,...) with the alignment (h/v).\n      ex: !put A1 h -> put a boat in A1 and B1\n          !put A1 v -> put a boat in A1 and A2 \n"
+    str_help += "!fire position : to fire in position\n```"
+    
+    return [data['d']['author']['id'],str_help]
     
 def start(data):
     global is_game_started
